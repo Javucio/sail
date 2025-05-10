@@ -27,7 +27,9 @@ def draw_menu(selected_color_index):
         (center[0] + size, center[1] + size)
     ])
 
-    instr = font.render("Flechas izquierda o derecha para seleccionar | ENTER para empezar", True, WHITE)
+    instr = font.render("Flechas izquierda o derecha para seleccionar", True, WHITE)
+    instr2 = font.render("ENTER para empezar", True, WHITE)
+    win.blit(instr2, (WIDTH//2 - instr2.get_width()//2, 430))
     win.blit(instr, (WIDTH//2 - instr.get_width()//2, 400))
     pygame.display.update()
 

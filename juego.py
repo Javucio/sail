@@ -1,5 +1,6 @@
 import pygame
 import math
+import random
 
 def ejecutar_juego(boat_color):
     pygame.init()
@@ -35,9 +36,38 @@ def ejecutar_juego(boat_color):
         pygame.draw.polygon(win, boat_color, [tip, left, right])
 
     def draw_wind_arrow():
-        wx = math.cos(math.radians(wind_angle)) * 50
-        wy = math.sin(math.radians(wind_angle)) * 50
+        arrow_length = 50 + wind_strength * 10  # Tamaño proporcional a la fuerza del viento
+        wx = math.cos(math.radians(wind_angle)) * arrow_length
+        wy = math.sin(math.radians(wind_angle)) * arrow_length
+
+        # Dibujar la línea principal de la flecha
         pygame.draw.line(win, WHITE, (50, 50), (50 + wx, 50 + wy), 3)
+
+        # Dibujar las puntas de la flecha
+        arrow_head_size = 10
+        angle_offset = math.radians(20)  # Ángulo de las puntas de la flecha
+        left_x = wx - math.cos(math.radians(wind_angle) - angle_offset) * arrow_head_size
+        left_y = wy - math.sin(math.radians(wind_angle) - angle_offset) * arrow_head_size
+        right_x = wx - math.cos(math.radians(wind_angle) + angle_offset) * arrow_head_size
+        right_y = wy - math.sin(math.radians(wind_angle) + angle_offset) * arrow_head_size
+
+        pygame.draw.line(win, WHITE, (50 + wx, 50 + wy), (50 + left_x, 50 + left_y), 3)
+        pygame.draw.line(win, WHITE, (50 + wx, 50 + wy), (50 + right_x, 50 + right_y), 3)
+        
+        # Determinar la dirección del viento
+        directions = [
+            ((0 + 45) % 360, "Tramontana"), ((45 + 45) % 360, "Gregal"), ((90 + 45) % 360, "Levante"), ((135 + 45) % 360, "Siroco"),
+            ((180 + 45) % 360, "Ostro"), ((225 + 45) % 360, "Lebeche"), ((270 + 45) % 360, "Poniente"), ((315 + 45) % 360, "Mistral")
+        ]
+        closest_direction = min(directions, key=lambda d: abs((wind_angle - d[0] + 360) % 360))
+        wind_direction = closest_direction[1]
+
+        # Mostrar la dirección y fuerza del viento
+        font = pygame.font.SysFont(None, 36)
+        text = font.render(f"Viento: {wind_direction} ({int(wind_strength * 10)})", True, WHITE)
+        win.blit(text, (WIDTH - 300, 10))
+        angle_text = font.render(f"Ángulo: {wind_angle}°", True, WHITE)
+        win.blit(angle_text, (WIDTH - 300, 50))
 
     running = True
     while running:
@@ -56,6 +86,8 @@ def ejecutar_juego(boat_color):
             pygame.time.wait(200)
         if keys[pygame.K_SPACE]:
             boat_pos = move_boat(boat_pos, boat_angle)
+            wind_strength = max(1, min(10, wind_strength + random.uniform(-1, 1)))
+            wind_angle = (wind_angle + random.choice([-45, -30, -15, 0, 15, 30, 45])) % 360
             pygame.time.wait(200)
 
         draw_boat(boat_pos, boat_angle)
