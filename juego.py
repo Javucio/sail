@@ -12,6 +12,10 @@ def ejecutar_juego(boat_color):
     WHITE = (255, 255, 255)
     BLUE = (100, 149, 237)
 
+    # Cambiar la fuente a la retro 8-bit con tamaño reducido
+    font_path = "assets/fonts/PressStart2P.ttf"  # Ruta a la fuente retro
+    font = pygame.font.Font(font_path, 18)  # Tamaño reducido para evitar desbordes
+
     boat_pos = [WIDTH // 2, HEIGHT // 2]
     boat_angle = 0  # grados
     wind_angle = 45
@@ -46,11 +50,10 @@ def ejecutar_juego(boat_color):
         return pos
     
     def draw_ceñida_indicator(angle_diff):
-        font_path = "assets/fonts/PressStart2P.ttf"  # Ruta a la fuente retro
-        font = pygame.font.Font(font_path, 24)
         if 30 <= angle_diff <= 45:
             text = font.render("Ceñida activa", True, WHITE)
-            win.blit(text, (10, HEIGHT - 80))
+            text_x = max(0, min(WIDTH - text.get_width(), 10))
+            win.blit(text, (text_x, HEIGHT - 80))
 
     def draw_boat(pos, angle):
         rad = math.radians(angle)
@@ -88,49 +91,9 @@ def ejecutar_juego(boat_color):
         wind_direction = closest_direction[1]
 
         # Mostrar la dirección y fuerza del viento
-        font = pygame.font.SysFont(None, 36)
         text = font.render(f"Viento: {wind_direction} ({int(wind_strength * 10)} nudos)", True, WHITE)
-        text_rect = text.get_rect()
-        text_rect.topleft = (WIDTH - 300, 10)
-        if text_rect.right > WIDTH:
-            text_rect.right = WIDTH - 10
-        if text_rect.bottom > HEIGHT:
-            text_rect.bottom = HEIGHT - 10
-        win.blit(text, text_rect.topleft)
-
-        # Ajustar la flecha del viento si excede los límites de la pantalla
-        arrow_length = 50 + wind_strength * 10  # Tamaño proporcional a la fuerza del viento
-        wx = math.cos(math.radians(wind_angle)) * arrow_length
-        wy = math.sin(math.radians(wind_angle)) * arrow_length
-
-        arrow_end_x = 50 + wx
-        arrow_end_y = 50 + wy
-
-        if arrow_end_x > WIDTH:
-            arrow_end_x = WIDTH - 10
-        if arrow_end_x < 0:
-            arrow_end_x = 10
-        if arrow_end_y > HEIGHT:
-            arrow_end_y = HEIGHT - 10
-        if arrow_end_y < 0:
-            arrow_end_y = 10
-
-        pygame.draw.line(win, WHITE, (50, 50), (arrow_end_x, arrow_end_y), 3)
-
-        # Dibujar las puntas de la flecha ajustadas
-        arrow_head_size = 10
-        angle_offset = math.radians(20)  # Ángulo de las puntas de la flecha
-        left_x = arrow_end_x - math.cos(math.radians(wind_angle) - angle_offset) * arrow_head_size
-        left_y = arrow_end_y - math.sin(math.radians(wind_angle) - angle_offset) * arrow_head_size
-        right_x = arrow_end_x - math.cos(math.radians(wind_angle) + angle_offset) * arrow_head_size
-        right_y = arrow_end_y - math.sin(math.radians(wind_angle) + angle_offset) * arrow_head_size
-
-        pygame.draw.line(win, WHITE, (arrow_end_x, arrow_end_y), (left_x, left_y), 3)
-        pygame.draw.line(win, WHITE, (arrow_end_x, arrow_end_y), (right_x, right_y), 3)
-        #angle_text = font.render(f"Ángulo: {wind_angle}°", True, WHITE)
-        #win.blit(angle_text, (WIDTH - 300, 50))
-        # Mostrar el valor de effectiveness
-
+        text_x = max(0, min(WIDTH - text.get_width(), WIDTH - 300))
+        win.blit(text, (text_x, 10))
 
     running = True
     while running:
