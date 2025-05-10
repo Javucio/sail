@@ -6,7 +6,10 @@ WIDTH, HEIGHT = 800, 600
 win = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Sail")
 clock = pygame.time.Clock()
-font = pygame.font.SysFont(None, 36)
+
+# Cambiar la fuente a la retro 8-bit
+font_path = "assets/fonts/PressStart2P.ttf"  # Ruta a la fuente retro
+font = pygame.font.Font(font_path, 24)  # Tamaño ajustado para la fuente retro
 
 WHITE = (255, 255, 255)
 BLUE = (100, 149, 237)
@@ -15,7 +18,7 @@ BOAT_COLORS = [(200, 50, 50), (50, 200, 50), (50, 100, 200)]  # rojo, verde, azu
 def draw_menu(selected_color_index):
     win.fill(BLUE)
     title = font.render("Elige el tipo de barco", True, WHITE)
-    win.blit(title, (WIDTH//2 - title.get_width()//2, 150))
+    win.blit(title, (WIDTH // 2 - title.get_width() // 2, 150))
 
     # Dibujar un triángulo representando el barco
     center = [WIDTH // 2, HEIGHT // 2]
@@ -27,10 +30,16 @@ def draw_menu(selected_color_index):
         (center[0] + size, center[1] + size)
     ])
 
+    # Ajustar las instrucciones para que no se salgan de la pantalla
     instr = font.render("Flechas izquierda o derecha para seleccionar", True, WHITE)
     instr2 = font.render("ENTER para empezar", True, WHITE)
-    win.blit(instr2, (WIDTH//2 - instr2.get_width()//2, 430))
-    win.blit(instr, (WIDTH//2 - instr.get_width()//2, 400))
+
+    # Centrar el texto horizontalmente y asegurarse de que no se salga de los límites
+    instr_x = max(0, min(WIDTH - instr.get_width(), WIDTH // 2 - instr.get_width() // 2))
+    instr2_x = max(0, min(WIDTH - instr2.get_width(), WIDTH // 2 - instr2.get_width() // 2))
+
+    win.blit(instr2, (instr2_x, 430))
+    win.blit(instr, (instr_x, 400))
     pygame.display.update()
 
 def menu():

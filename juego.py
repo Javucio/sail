@@ -6,7 +6,7 @@ def ejecutar_juego(boat_color):
     pygame.init()
     WIDTH, HEIGHT = 800, 600
     win = pygame.display.set_mode((WIDTH, HEIGHT))
-    pygame.display.set_caption("Juego de Regata")
+    pygame.display.set_caption("Sailmaniac")
     clock = pygame.time.Clock()
 
     WHITE = (255, 255, 255)
@@ -16,14 +16,27 @@ def ejecutar_juego(boat_color):
     boat_angle = 0  # grados
     wind_angle = 45
     wind_strength = 1.5
-    
 
     def move_boat(pos, angle):
         rad = math.radians(angle)
         dx = math.cos(rad)
         dy = math.sin(rad)
+
+        # Calcular la diferencia angular entre el barco y el viento
         angle_diff = abs((angle - wind_angle + 360) % 360)
-        effectiveness = max(0.2, math.cos(math.radians(angle_diff)))  # 0.2 a 1
+
+        # Ajustar la lógica de efectividad según la dirección del viento
+        if 150 <= angle_diff <= 210:  # Directamente contra el viento (viento de proa)
+            effectiveness = 0.0  # Sin movimiento
+        elif angle_diff < 30 or angle_diff > 330:  # Viento de popa (viento detrás del barco)
+            effectiveness = 1.0  # Máxima efectividad
+        elif 30 <= angle_diff <= 60 or 300 <= angle_diff <= 330:  # Ceñida (ángulos cercanos al viento de proa)
+            effectiveness = 0.5  # Efectividad reducida
+        else:
+            # Efectividad basada en el coseno para otros ángulos
+            effectiveness = max(0.2, math.cos(math.radians(angle_diff)))
+
+        # Calcular el nuevo movimiento del barco
         new_x = pos[0] + dx * wind_strength * effectiveness * 10
         new_y = pos[1] + dy * wind_strength * effectiveness * 10
 
@@ -31,6 +44,13 @@ def ejecutar_juego(boat_color):
         pos[0] = max(0, min(WIDTH, new_x))
         pos[1] = max(0, min(HEIGHT, new_y))
         return pos
+    
+    def draw_ceñida_indicator(angle_diff):
+        font_path = "assets/fonts/PressStart2P.ttf"  # Ruta a la fuente retro
+        font = pygame.font.Font(font_path, 24)
+        if 30 <= angle_diff <= 45:
+            text = font.render("Ceñida activa", True, WHITE)
+            win.blit(text, (10, HEIGHT - 80))
 
     def draw_boat(pos, angle):
         rad = math.radians(angle)
@@ -109,6 +129,8 @@ def ejecutar_juego(boat_color):
         pygame.draw.line(win, WHITE, (arrow_end_x, arrow_end_y), (right_x, right_y), 3)
         #angle_text = font.render(f"Ángulo: {wind_angle}°", True, WHITE)
         #win.blit(angle_text, (WIDTH - 300, 50))
+        # Mostrar el valor de effectiveness
+
 
     running = True
     while running:
